@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Surgical Tray Dashboard</title>
+  <style>
+    body { font-family: Arial; background:#f5f7fa; }
+    table { border-collapse: collapse; width: 100%; background:white; }
+    th, td { padding: 10px; border-bottom: 1px solid #ddd; }
+    th { background:#0b5ed7; color:white; }
+    a.btn { background:#198754; color:white; padding:6px 10px; text-decoration:none; border-radius:4px; }
+  </style>
+</head>
+<body>
+<h2>Pending Surgical Trays</h2>
+<table id="tbl">
+  <thead>
+    <tr>
+      <th>Tray</th>
+      <th>Unit</th>
+      <th>Patient</th>
+      <th>Hospital No</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/11RBTytznjd-9_66ZM7Yp6Cpi3szht0uR2VQdGk93PPM/edit?usp=sharing';
+const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwUiI2_v4coLnc4rlCNe4s4Hynsy7u3IbV8vy6RDOsqzu-BhU2RqVYAns5oB5-BdQc/exec';
+
+fetch(SHEET_URL)
+  .then(r => r.text())
+  .then(t => {
+    const rows = t.split('\n').slice(1);
+    const tbody = document.querySelector('#tbl tbody');
+
+    rows.forEach(r => {
+      const c = r.split(',');
+      if (c[11] === 'RECEIVED') {
+        tbody.innerHTML += `
+          <tr>
+            <td>${c[2]}</td>
+            <td>${c[7]}</td>
+            <td>${c[8]}</td>
+            <td>${c[9]}</td>
+            <td><a class="btn" href="${WEBAPP_URL}?id=${c[0]}" target="_blank">RETURN</a></td>
+          </tr>`;
+      }
+    });
+  });
+</script>
+</body>
+</html>
