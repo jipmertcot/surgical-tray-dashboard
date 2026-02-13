@@ -25,32 +25,47 @@
   </thead>
   <tbody></tbody>
 </table>
-
 <script>
 const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSK4y3FW07pLbORvDfTlU3vWnG8m49QP6x4DkyRblTvz9Y8qg4CJuePJn4VqJ0Ew78rANRR7imfxzSP/pub?output=csv';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwUiI2_v4coLnc4rlCNe4s4Hynsy7u3IbV8vy6RDOsqzu-BhU2RqVYAns5oB5-BdQc/exec';
 
 fetch(SHEET_URL)
-  .then(r => r.text())
-  .then(t => {
-    const rows = t.split('\n').slice(1);
+  .then(res => res.text())
+  .then(csv => {
+    const rows = csv.split('\n').slice(1);
     const tbody = document.querySelector('#tbl tbody');
 
-    rows.forEach(r => {
-      const c = r.split(',');
-      if (c[11] === 'RECEIVED') {
-        tbody.innerHTML += `
-          <tr>
-            <td>${c[2]}</td>
-            <td>${c[7]}</td>
-            <td>${c[8]}</td>
-            <td>${c[9]}</td>
-            <td><a class="btn" href="${WEBAPP_URL}?id=${c[0]}" target="_blank">RETURN</a></td>
-          </tr>`;
+    rows.forEach(row => {
+      const c = row.split(',');
+
+      // Status column = L = index 11
+      if (c[11] && c[11].trim() === 'RECEIVED') {
+        const tr = document.createElement('tr');
+
+        tr.innerHTML = `
+          <td>${c[2] || ''}</td>
+          <td>${c[7] || ''}</td>
+          <td>${c[8] || ''}</td>
+          <td>${c[9] || ''}</td>
+          <td>
+            <a class="btn"
+               href="${WEBAPP_URL}?id=${c[0]}"
+               target="_blank">
+               RETURN
+            </a>
+          </td>
+        `;
+        tbody.appendChild(tr);
       }
     });
+  })
+  .catch(err => {
+    document.body.innerHTML =
+      '<h3>Error loading data</h3><pre>' + err + '</pre>';
   });
 </script>
+
 </body>
 
 </html>
+
